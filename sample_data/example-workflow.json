@@ -1,0 +1,19 @@
+{
+  "account_event": {
+    "event_type": "meeting_completed",
+    "account_id": "acct-northwind",
+    "account_name": "Northwind Labs",
+    "contact_name": "Avery Morgan",
+    "contact_email": "avery@example.test",
+    "source": "portfolio-demo",
+    "attributes": {
+      "region": "EMEA"
+    }
+  },
+  "meeting_notes": {
+    "meeting_id": "meeting-2026-001",
+    "transcript": "The team needs an integration that reduces manual follow-up. Security review and an approval step are required before messages can be sent. The timeline is still being discussed.",
+    "occurred_at": "2026-10-26T14:00:00Z"
+  }
+}
+
