@@ -1,0 +1,21 @@
+[
+  {
+    "name": "integration-and-approval",
+    "transcript": "We need an integration that reduces manual work and requires approval.",
+    "expected_need": "A reliable integration path across existing systems",
+    "expected_tool": "local_retrieval"
+  },
+  {
+    "name": "security-review",
+    "transcript": "Security review is mandatory before follow-up can be sent.",
+    "expected_need": "Clear security and privacy controls",
+    "expected_tool": "local_retrieval"
+  },
+  {
+    "name": "schema-fallback",
+    "transcript": "The team wants to understand the workflow options.",
+    "expected_need": "Clarification of the desired workflow and integration boundaries",
+    "expected_tool": "local_retrieval"
+  }
+]
+

@@ -1,0 +1,31 @@
+services:
+  api:
+    build: .
+    environment:
+      GTM_API_TOKEN: ${GTM_API_TOKEN:-local-demo-token}
+      GTM_WEBHOOK_SECRET: ${GTM_WEBHOOK_SECRET:-local-webhook-secret}
+      GTM_DATABASE_PATH: /app/data/gtm_workflows.db
+      GTM_KNOWLEDGE_PATH: /app/sample_data/knowledge
+      GTM_REPLAY_PATH: /app/sample_data/replay_responses.json
+      GTM_ALLOWED_ORIGINS: http://localhost:5173,http://localhost:8080
+    volumes:
+      - workflow-data:/app/data
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  web:
+    build: ./frontend
+    depends_on:
+      api:
+        condition: service_healthy
+    ports:
+      - "8080:80"
+
+volumes:
+  workflow-data:
+

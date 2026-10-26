@@ -1,0 +1,2 @@
+"""GTM approval platform backend."""
+

@@ -1,0 +1,22 @@
+{
+  "default": {
+    "needs_by_keyword": {
+      "integration": "A reliable integration path across existing systems",
+      "approval": "A controlled human approval workflow",
+      "security": "Clear security and privacy controls",
+      "manual": "Reduced manual account research",
+      "follow-up": "Consistent, timely follow-up preparation"
+    },
+    "risks_by_keyword": {
+      "timeline": "Implementation timing needs confirmation",
+      "security": "Security review is required before connecting production data",
+      "budget": "Budget and commercial ownership are not yet confirmed",
+      "legal": "Legal review may affect the rollout schedule"
+    },
+    "fallback_need": "Clarification of the desired workflow and integration boundaries",
+    "fallback_risk": "Decision process and timeline remain unconfirmed",
+    "recommended_next_step": "Review the evidence, confirm requirements, and approve a scoped follow-up.",
+    "action_step": "confirm requirements and agree on a small, approval-gated pilot"
+  }
+}
+

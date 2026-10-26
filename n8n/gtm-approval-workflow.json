@@ -1,0 +1,150 @@
+{
+  "name": "Portfolio - Grounded GTM approval workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "portfolio-gtm-intake",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "webhook-intake",
+      "name": "Webhook Intake",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.GTM_API_URL || 'http://host.docker.internal:8000'}}/api/workflows",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{$env.GTM_API_TOKEN || 'local-demo-token'}}"
+            },
+            {
+              "name": "Idempotency-Key",
+              "value": "={{$json.event_id || $execution.id}}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify($json.payload || $json) }}",
+        "options": {}
+      },
+      "id": "create-workflow",
+      "name": "Create Durable Workflow",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [240, 0]
+    },
+    {
+      "parameters": {
+        "amount": 2,
+        "unit": "seconds"
+      },
+      "id": "wait",
+      "name": "Wait Before Poll",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [480, 0],
+      "webhookId": "portfolio-poll-wait"
+    },
+    {
+      "parameters": {
+        "url": "={{$env.GTM_API_URL || 'http://host.docker.internal:8000'}}/api/workflows/{{$node['Create Durable Workflow'].json.id}}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{$env.GTM_API_TOKEN || 'local-demo-token'}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "get-status",
+      "name": "Get Workflow Status",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [720, 0]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "leftValue": "={{$json.state}}",
+              "rightValue": "awaiting_approval",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "approval-ready",
+      "name": "Awaiting Human Approval?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [960, 0]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { workflow_id: $json.id, state: $json.state, message: 'Open the portfolio UI to review evidence and approve or reject. n8n does not bypass approval.' } }}",
+        "options": {}
+      },
+      "id": "respond",
+      "name": "Return Approval Required",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [1200, -80]
+    }
+  ],
+  "connections": {
+    "Webhook Intake": {
+      "main": [[{ "node": "Create Durable Workflow", "type": "main", "index": 0 }]]
+    },
+    "Create Durable Workflow": {
+      "main": [[{ "node": "Wait Before Poll", "type": "main", "index": 0 }]]
+    },
+    "Wait Before Poll": {
+      "main": [[{ "node": "Get Workflow Status", "type": "main", "index": 0 }]]
+    },
+    "Get Workflow Status": {
+      "main": [[{ "node": "Awaiting Human Approval?", "type": "main", "index": 0 }]]
+    },
+    "Awaiting Human Approval?": {
+      "main": [
+        [{ "node": "Return Approval Required", "type": "main", "index": 0 }],
+        [{ "node": "Wait Before Poll", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "active": false,
+  "tags": [
+    {
+      "name": "portfolio-artifact"
+    }
+  ]
+}
+
